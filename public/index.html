@@ -2200,6 +2200,39 @@ const I18N = {
   report_hour_unit: { zh: '小时', en: 'h' },
   report_complete_label: { zh: '完成', en: 'Done' },
   report_label: { zh: '复盘', en: 'Review' },
+
+  // Daily Quotes
+  daily_quote_0: { zh: '每一个大师都曾是初学者，坚持下去！', en: 'Every expert was once a beginner. Keep going!' },
+  daily_quote_1: { zh: '每天一小步，终成一大步。', en: 'Small steps every day lead to big results.' },
+  daily_quote_2: { zh: '不求完美，但求进步。你可以的！', en: 'Progress, not perfection. You\'ve got this!' },
+  daily_quote_3: { zh: '种一棵树最好的时间是十年前，其次是现在。', en: 'The best time to start was yesterday. The next best is now.' },
+  daily_quote_4: { zh: '别盯着时钟看，像它一样——永不停歇。', en: 'Don\'t watch the clock; do what it does — keep going.' },
+  daily_quote_5: { zh: '唯一的限制是你的内心，向前冲！', en: 'Your only limit is your mind. Push forward!' },
+  daily_quote_6: { zh: '舒适区里长不出参天大树。', en: 'Great things never come from comfort zones.' },
+  daily_quote_7: { zh: '自律是连接目标和成就的桥梁。', en: 'Discipline is the bridge between goals and accomplishment.' },
+  daily_quote_8: { zh: '不必等到优秀才开始，但开始了才会变得优秀。', en: 'You don\'t have to be great to start, but you have to start to be great.' },
+  daily_quote_9: { zh: '领先的秘诀就是迈出第一步。', en: 'The secret of getting ahead is getting started.' },
+  daily_quote_10: { zh: '相信自己，你已经成功了一半。', en: 'Believe you can and you\'re halfway there.' },
+  daily_quote_11: { zh: '事情在完成之前，总是看似不可能的。', en: 'It always seems impossible until it\'s done.' },
+  daily_quote_12: { zh: '成功是日复一日微小努力的总和。', en: 'Success is the sum of small efforts repeated day in and day out.' },
+  daily_quote_13: { zh: '不要数日子，要让日子有价值。', en: 'Don\'t count the days, make the days count.' },
+  daily_quote_14: { zh: '未来取决于你今天做了什么。', en: 'The future depends on what you do today.' },
+  daily_quote_15: { zh: '志存高远，脚踏实地，专注前行。', en: 'Dream big, work hard, stay focused.' },
+  daily_quote_16: { zh: '你是什么样的人，就会吸引什么样的人。', en: 'Your vibe attracts your tribe. Keep shining!' },
+  daily_quote_17: { zh: '成为你想遇见的那种能量。', en: 'Be the energy you want to attract.' },
+  daily_quote_18: { zh: '完成比完美更重要，先做出来！', en: 'Done is better than perfect. Ship it!' },
+  daily_quote_19: { zh: '坚持是把平凡变成卓越的唯一途径。', en: 'Consistency is what transforms average into excellence.' },
+  daily_quote_20: { zh: '今天是元气满满的一天！', en: 'Today is a perfect day to be productive.' },
+  daily_quote_21: { zh: '要么今天开始，要么永远观望——你说了算。', en: 'One day or day one — you decide.' },
+  daily_quote_22: { zh: '保持积极，努力付出，让梦想成真。', en: 'Stay positive, work hard, make it happen.' },
+  daily_quote_23: { zh: '越努力，越幸运。', en: 'The harder you work, the greater you\'ll feel when you achieve it.' },
+  daily_quote_24: { zh: '关注进步，而非完美。', en: 'Focus on progress, not perfection.' },
+  daily_quote_25: { zh: '你的潜力远超你的想象。', en: 'You are capable of more than you know.' },
+  daily_quote_26: { zh: '每一个成就都始于敢于尝试的决定。', en: 'Every accomplishment starts with the decision to try.' },
+  daily_quote_27: { zh: '推自己一把，没人能替你做这件事。', en: 'Push yourself, because no one else is going to do it for you.' },
+  daily_quote_28: { zh: '大事需要时间，对自己耐心一点。', en: 'Great things take time. Be patient with yourself.' },
+  daily_quote_29: { zh: '别再空想，开始行动。', en: 'Stop wishing. Start doing.' },
+  daily_quote_30: { zh: '梦想不会自己实现，除非你动手去做。', en: 'Your dreams don\'t work unless you do.' },
 };
 
 function t(key) {
@@ -2896,43 +2929,11 @@ function renderDashboard() {
   document.getElementById('greetingText').textContent = greeting;
 
   // Daily motivational English quote (changes each day)
-  const dailyQuotes = [
-    "每一个大师都曾是初学者，坚持下去！",
-    "每天一小步，终成一大步。",
-    "不求完美，但求进步。你可以的！",
-    "种一棵树最好的时间是十年前，其次是现在。",
-    "别盯着时钟看，像它一样——永不停歇。",
-    "唯一的限制是你的内心，向前冲！",
-    "舒适区里长不出参天大树。",
-    "自律是连接目标和成就的桥梁。",
-    "不必等到优秀才开始，但开始了才会变得优秀。",
-    "领先的秘诀就是迈出第一步。",
-    "相信自己，你已经成功了一半。",
-    "事情在完成之前，总是看似不可能的。",
-    "成功是日复一日微小努力的总和。",
-    "不要数日子，要让日子有价值。",
-    "未来取决于你今天做了什么。",
-    "志存高远，脚踏实地，专注前行。",
-    "你是什么样的人，就会吸引什么样的人。",
-    "成为你想遇见的那种能量。",
-    "完成比完美更重要，先做出来！",
-    "坚持是把平凡变成卓越的唯一途径。",
-    "今天是元气满满的一天！",
-    "要么今天开始，要么永远观望——你说了算。",
-    "保持积极，努力付出，让梦想成真。",
-    "越努力，越幸运。",
-    "关注进步，而非完美。",
-    "你的潜力远超你的想象。",
-    "每一个成就都始于敢于尝试的决定。",
-    "推自己一把，没人能替你做这件事。",
-    "大事需要时间，对自己耐心一点。",
-    "别再空想，开始行动。",
-    "梦想不会自己实现，除非你动手去做。"
-  ];
+  const totalQuotes = 31;
   const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000);
-  const quoteIndex = dayOfYear % dailyQuotes.length;
+  const quoteIndex = dayOfYear % totalQuotes;
   const quoteEl = document.getElementById('dailyQuote');
-  if (quoteEl) quoteEl.textContent = '"' + dailyQuotes[quoteIndex] + '"';
+  if (quoteEl) quoteEl.textContent = '"' + t('daily_quote_' + quoteIndex) + '"';
 
   // Apply custom banner background
   const banner = document.getElementById('todayBanner');
