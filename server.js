@@ -6,7 +6,7 @@ const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 3456;
-const JWT_SECRET = process.env.JWT_SECRET || 'kane-workbench-secret-' + Date.now();
+const JWT_SECRET = process.env.JWT_SECRET || 'kane-workbench-prod-secret-key-2024';
 const DATA_DIR = path.join(__dirname, 'data');
 const USERS_FILE = path.join(DATA_DIR, 'users.json');
 const USERDATA_DIR = path.join(DATA_DIR, 'userdata');
