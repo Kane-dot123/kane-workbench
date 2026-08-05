@@ -318,17 +318,22 @@ body {
   background: linear-gradient(135deg, #007AFF 0%, #5856D6 50%, #AF52DE 100%);
   background-size: cover;
   background-position: center;
-  border-radius: var(--radius);
-  padding: 20px;
+  border-radius: 0;
+  padding: 24px 32px;
   color: #fff;
-  margin-bottom: 16px;
+  margin: 0 -16px 16px;
+  width: calc(100% + 32px);
+  min-height: 160px;
   position: relative;
   overflow: hidden;
+  display: flex;
+  align-items: center;
 }
 [data-theme="dark"] .today-banner {
   background: linear-gradient(135deg, #0A84FF 0%, #5E5CE6 50%, #BF5AF2 100%);
   background-size: cover;
   background-position: center;
+  min-height: 160px;
 }
 .today-banner.has-image { background-image: none; }
 .today-banner .banner-overlay {
@@ -342,6 +347,7 @@ body {
 .today-banner .banner-content {
   position: relative;
   z-index: 2;
+  width: 100%;
 }
 .today-banner .banner-edit-btn {
   position: absolute;
