@@ -340,6 +340,152 @@ body {
   flex-shrink: 0;
   margin-left: 8px;
 }
+.checkin-card .task-actions {
+  opacity: 0;
+  transition: opacity 0.2s;
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+.checkin-card:hover .task-actions {
+  opacity: 1;
+}
+.task-action-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: var(--bg-tertiary);
+  cursor: pointer;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+.task-action-btn.edit:hover { background: var(--accent); color: #fff; }
+.task-action-btn.delete:hover { background: var(--red); color: #fff; }
+.add-task-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 12px;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+  margin-top: 12px;
+}
+.add-task-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-light);
+}
+/* Icon Picker */
+.icon-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 8px 0;
+  max-height: 180px;
+  overflow-y: auto;
+}
+.icon-picker-item {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background: var(--bg-tertiary);
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+.icon-picker-item:hover { border-color: var(--accent); transform: scale(1.1); }
+.icon-picker-item.selected { border-color: var(--accent); background: var(--accent-light); }
+/* Task Modal */
+.task-form-group {
+  margin-bottom: 16px;
+}
+.task-form-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+.task-form-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 15px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+.task-form-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.task-modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+.task-modal-actions button {
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+}
+.task-modal-save {
+  background: var(--accent);
+  color: #fff;
+}
+.task-modal-save:hover { opacity: 0.9; }
+.task-modal-cancel {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+.task-modal-cancel:hover { background: var(--border); }
+.task-modal-delete {
+  background: var(--red-light);
+  color: var(--red);
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+  margin-bottom: 10px;
+}
+.task-modal-delete:hover { background: var(--red); color: #fff; }
+/* Delete confirm */
+.delete-warning {
+  background: #FFF3E0;
+  border: 1px solid var(--orange);
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 13px;
+  color: #E65100;
+  margin-top: 10px;
+}
 
 /* ========== Learning Calendar ========== */
 .learn-calendar-container {
@@ -1663,6 +1809,9 @@ body {
 
       <div class="section-subtitle">📋 打卡项目</div>
       <div id="checkInCards"></div>
+      <button class="add-task-btn" onclick="openTaskModal()">
+        <span style="font-size:18px">+</span> <span data-i18n="checkin_add_task">添加打卡项目</span>
+      </button>
 
       <div id="learnRecords"></div>
 
@@ -2085,6 +2234,23 @@ const I18N = {
   checkin_none: { zh: '今天还没有打卡哦', en: 'No check-ins yet today' },
   checkin_progress: { zh: '完成进度', en: 'Progress' },
   checkin_calendar: { zh: '打卡日历', en: 'Calendar' },
+  checkin_add_task: { zh: '+ 添加打卡项目', en: '+ Add Task' },
+  checkin_edit: { zh: '编辑', en: 'Edit' },
+  checkin_delete: { zh: '删除', en: 'Delete' },
+  checkin_new_task: { zh: '新增打卡项目', en: 'New Check-in Task' },
+  checkin_edit_task: { zh: '编辑打卡项目', en: 'Edit Check-in Task' },
+  checkin_task_name: { zh: '中文名称', en: 'Chinese Name' },
+  checkin_task_name_en: { zh: '英文名称', en: 'English Name' },
+  checkin_task_icon: { zh: '选择图标', en: 'Pick Icon' },
+  checkin_save: { zh: '保存', en: 'Save' },
+  checkin_cancel: { zh: '取消', en: 'Cancel' },
+  checkin_confirm_delete: { zh: '⚠️ 确定要删除这个打卡项目吗？历史打卡数据将保留。', en: '⚠️ Delete this task? Check-in history will be preserved.' },
+  checkin_delete_btn: { zh: '确认删除', en: 'Confirm Delete' },
+  checkin_empty_tasks: { zh: '还没有打卡项目\n点击下方按钮添加', en: 'No check-in tasks yet\nTap below to add' },
+  checkin_well_done: { zh: '🏆 太厉害了！今天全部完成！', en: '🏆 Amazing! All done today!' },
+  checkin_almost: { zh: '💪 就差一点了，继续加油！', en: '💪 Almost there, keep going!' },
+  checkin_good_start: { zh: '👍 做得不错，继续坚持！', en: '👍 Good progress, keep it up!' },
+  checkin_lets_go: { zh: '🎯 今天还没有打卡，开始吧！', en: '🎯 Let\'s get started today!' },
   calendar_prev: { zh: '上个月', en: 'Prev' },
   calendar_next: { zh: '下个月', en: 'Next' },
   calendar_less: { zh: '少', en: 'Less' },
@@ -2740,17 +2906,13 @@ function getDefaultData() {
     learning: {
       records: [],
       checkIns: {},
-      modules: [
-        { id: 'eng', name: '英语学习', hours: 0, target: 1 },
-        { id: 'course', name: '课程学习', hours: 0, target: 0.5 }
+      checkInTasks: [
+        { id: 'vocab', name: '背单词', nameEn: 'Vocab', icon: '📝' },
+        { id: 'eng_class', name: '上英语课', nameEn: 'English Class', icon: '🏫' },
+        { id: 'pronunciation', name: '练习发音', nameEn: 'Pronunciation', icon: '🗣️' },
+        { id: 'writing', name: '写句子', nameEn: 'Writing', icon: '✍️' }
       ]
     },
-    checkInTasks: [
-      { id: 'vocab', name: '背单词', nameEn: 'Vocab', icon: '📝' },
-      { id: 'eng_class', name: '上英语课', nameEn: 'English Class', icon: '🏫' },
-      { id: 'pronunciation', name: '练习发音', nameEn: 'Pronunciation', icon: '🗣️' },
-      { id: 'writing', name: '写句子', nameEn: 'Writing', icon: '✍️' }
-    ],
     consume: {
       records: [],
       monthlyLimit: 2500
@@ -2988,7 +3150,7 @@ function get30DaySummary() {
   const learnRecords = appData.learning.records.filter(r => r.date >= startStr && r.date <= getTodayStr());
 
   // Check-in stats
-  const tasks = appData.checkInTasks;
+  const tasks = appData.learning.checkInTasks || [];
   let checkInDays = 0, checkInTotal = 0;
   if (appData.learning.checkIns) {
     const startD = new Date(startDate);
@@ -3162,7 +3324,7 @@ function renderDashboard() {
 
   // Check-in stats for today
   const todayCheckIns = (appData.learning.checkIns && appData.learning.checkIns[today]) || {};
-  const tasks = appData.checkInTasks;
+  const tasks = appData.learning.checkInTasks || [];
   const checkInDone = tasks.filter(t => todayCheckIns[t.id]).length;
   const checkInTotal = tasks.length;
   const todayConsume = appData.consume.records.filter(r => r.date === today);
@@ -3292,7 +3454,7 @@ function renderLearningCalendar() {
   let startDow = firstDay.getDay(); // 0=Sun
   startDow = startDow === 0 ? 6 : startDow - 1; // Convert to Mon=0
 
-  const tasks = appData.checkInTasks;
+  const tasks = appData.learning.checkInTasks || [];
 
   // Build calendar cells
   let cellsHtml = '';
@@ -3330,17 +3492,19 @@ function renderLearningCalendar() {
     if (isSelected) cls += ' selected';
     if (isFuture) cls += ' future';
 
-    // Dots for task completion
+    // Show dots (max 5) or fraction for more tasks
     let dotsHtml = '';
-    for (let t = 0; t < totalCount; t++) {
-      const taskDone = ci[tasks[t].id];
-      dotsHtml += `<div class="learn-calendar-dot${taskDone ? ' done' : ''}"></div>`;
+    if (totalCount <= 5) {
+      for (let t = 0; t < totalCount; t++) {
+        const taskDone = ci[tasks[t].id];
+        dotsHtml += `<div class="learn-calendar-dot${taskDone ? ' done' : ''}"></div>`;
+      }
     }
 
     cellsHtml += `
       <div class="${cls}" style="${bgStyle}" onclick="${!isFuture ? `selectCalendarDate('${ds}')` : ''}">
         <span>${day}</span>
-        <div class="learn-calendar-dots">${dotsHtml}</div>
+        ${totalCount <= 5 ? `<div class="learn-calendar-dots">${dotsHtml}</div>` : `<div style="font-size:8px;margin-top:1px;color:var(--text-tertiary);line-height:1">${doneCount}/${totalCount}</div>`}
       </div>`;
   }
 
@@ -3396,10 +3560,11 @@ function renderLearning() {
 
   // Get check-ins for selected date
   const todayCheckIns = (appData.learning.checkIns && appData.learning.checkIns[today]) || {};
-  const tasks = appData.checkInTasks;
-  const doneCount = tasks.filter(t => todayCheckIns[t.id]).length;
+  const tasks = appData.learning.checkInTasks || [];
   const totalCount = tasks.length;
-  const pct = Math.round((doneCount / totalCount) * 100);
+  const doneCount = totalCount > 0 ? tasks.filter(t => todayCheckIns[t.id]).length : 0;
+  const pct = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0;
+  const isToday = today === getTodayStr();
 
   // Stats
   document.getElementById('learnDoneToday').textContent = doneCount + '/' + totalCount;
@@ -3424,24 +3589,33 @@ function renderLearning() {
   else if (pct >= 50) bar.style.background = '#FF9500';
   else bar.style.background = 'var(--accent)';
 
-  // Status text
+  // Motivational status text
   const statusEl = document.getElementById('checkinStatus');
-  if (pct === 100) {
-    statusEl.textContent = t('checkin_all_done');
-  } else if (doneCount === 0) {
-    statusEl.textContent = t('checkin_none');
+  if (totalCount === 0) {
+    statusEl.textContent = t('checkin_empty_tasks').split('\n')[0];
+  } else if (pct === 100) {
+    statusEl.textContent = t('checkin_well_done');
+  } else if (pct >= 75) {
+    statusEl.textContent = t('checkin_almost');
+  } else if (doneCount > 0) {
+    statusEl.textContent = t('checkin_good_start');
   } else {
-    statusEl.textContent = doneCount + '/' + totalCount + ' ' + t('checkin_done_today');
+    statusEl.textContent = t('checkin_lets_go');
   }
 
-  // Check-in cards
-  const isToday = today === getTodayStr();
-  const cardsHtml = tasks.map(tk => {
-    const checked = !!todayCheckIns[tk.id];
-    const name = appData.lang === 'en' ? tk.nameEn : tk.name;
-    return `
-      <div class="card checkin-card ${checked ? 'checkin-done' : ''}" onclick="toggleCheckIn('${tk.id}')" style="cursor:pointer;transition:all 0.2s">
-        <div class="card-row">
+  // Check-in cards with edit/delete buttons
+  let cardsHtml;
+  if (tasks.length === 0) {
+    cardsHtml = `<div style="text-align:center;padding:30px 20px;color:var(--text-tertiary);font-size:14px;white-space:pre-line">
+      ${t('checkin_empty_tasks')}
+    </div>`;
+  } else {
+    cardsHtml = tasks.map(tk => {
+      const checked = !!todayCheckIns[tk.id];
+      const name = appData.lang === 'en' ? (tk.nameEn || tk.name) : tk.name;
+      return `
+      <div class="card checkin-card ${checked ? 'checkin-done' : ''}">
+        <div class="card-row" onclick="${isToday || today < getTodayStr() ? `toggleCheckIn('${tk.id}')` : ''}" style="cursor:${isToday || today < getTodayStr() ? 'pointer' : 'default'};flex:1">
           <div class="checkin-check ${checked ? 'checked' : ''}">${checked ? '✅' : '⭕'}</div>
           <div class="checkin-icon">${tk.icon}</div>
           <div class="card-info" style="flex:1;margin-left:12px">
@@ -3449,13 +3623,17 @@ function renderLearning() {
           </div>
           ${checked ? '<div style="color:#34C759;font-size:13px">✓</div>' : ''}
         </div>
+        <div class="task-actions">
+          <button class="task-action-btn edit" onclick="event.stopPropagation();openTaskModal('${tk.id}')" title="${t('checkin_edit')}">✏️</button>
+          <button class="task-action-btn delete" onclick="event.stopPropagation();deleteTask('${tk.id}')" title="${t('checkin_delete')}">🗑️</button>
+        </div>
       </div>`;
-  }).join('');
+    }).join('');
+  }
   document.getElementById('checkInCards').innerHTML = cardsHtml;
 
-  // Legacy records section (hidden by default, kept for backward compat)
-  const records = appData.learning.records.filter(r => r.date === today);
-  document.getElementById('learnRecords').innerHTML = records.length > 0 ? '' : '';
+  // Legacy records section
+  document.getElementById('learnRecords').innerHTML = '';
 }
 
 function toggleCheckIn(taskId) {
@@ -3470,6 +3648,101 @@ function toggleCheckIn(taskId) {
   saveData();
   renderLearning();
   renderDashboard();
+}
+
+// ============ Check-in Task Management ============
+const TASK_ICONS = ['📝','📚','🎓','🏫','🗣️','✍️','💻','🎯','🏃','🎵','🧘','🍎','💧','📖','🔤','🎨','🧠','⚡','🌟','🔥','💪','🎬','📸','🎮','🧩','🔬','💰','📊','🏆','🎁','🛠️','🌍','🧹','💤','📅','⏰','🔑','❤️','🌈','🍀'];
+
+let editingTaskId = null;
+
+function openTaskModal(taskId) {
+  editingTaskId = taskId || null;
+  const task = taskId ? appData.learning.checkInTasks.find(t => t.id === taskId) : null;
+  const isEdit = !!task;
+
+  const title = isEdit ? t('checkin_edit_task') : t('checkin_new_task');
+
+  const iconsHtml = TASK_ICONS.map(ic => {
+    const sel = task && task.icon === ic ? ' selected' : '';
+    return `<div class="icon-picker-item${sel}" onclick="document.querySelectorAll('.icon-picker-item').forEach(e=>e.classList.remove('selected'));this.classList.add('selected');document.getElementById('taskIconInput').value='${ic}'">${ic}</div>`;
+  }).join('');
+
+  const content = `
+    <h3 style="margin:0 0 16px;font-size:18px;text-align:center">${title}</h3>
+    ${isEdit ? `<button class="task-modal-delete" onclick="deleteTask('${taskId}')">${t('checkin_delete_btn')}</button>` : ''}
+    <div class="task-form-group">
+      <label class="task-form-label">${t('checkin_task_name')} *</label>
+      <input class="task-form-input" id="taskNameInput" placeholder="例如：背单词" value="${task ? task.name : ''}">
+    </div>
+    <div class="task-form-group">
+      <label class="task-form-label">${t('checkin_task_name_en')}</label>
+      <input class="task-form-input" id="taskNameEnInput" placeholder="e.g. Vocab" value="${task ? (task.nameEn || '') : ''}">
+    </div>
+    <div class="task-form-group">
+      <label class="task-form-label">${t('checkin_task_icon')}</label>
+      <input type="hidden" id="taskIconInput" value="${task ? task.icon : '📝'}">
+      <div class="icon-picker" id="iconPicker">${iconsHtml}</div>
+    </div>
+    <div class="task-modal-actions">
+      <button class="task-modal-cancel" onclick="closeModal()">${t('checkin_cancel')}</button>
+      <button class="task-modal-save" onclick="saveTask()">${t('checkin_save')}</button>
+    </div>
+  `;
+
+  document.getElementById('modalContent').innerHTML = content;
+  document.getElementById('modalOverlay').classList.add('show');
+}
+
+function saveTask() {
+  const nameEl = document.getElementById('taskNameInput');
+  const nameEnEl = document.getElementById('taskNameEnInput');
+  const iconEl = document.getElementById('taskIconInput');
+  const name = nameEl ? nameEl.value.trim() : '';
+  const nameEn = nameEnEl ? nameEnEl.value.trim() : '';
+  const icon = iconEl ? iconEl.value : '📝';
+
+  if (!name) {
+    nameEl.style.borderColor = 'var(--red)';
+    nameEl.focus();
+    return;
+  }
+  nameEl.style.borderColor = '';
+
+  if (!appData.learning.checkInTasks) appData.learning.checkInTasks = [];
+
+  if (editingTaskId) {
+    // Edit existing
+    const idx = appData.learning.checkInTasks.findIndex(t => t.id === editingTaskId);
+    if (idx >= 0) {
+      appData.learning.checkInTasks[idx].name = name;
+      appData.learning.checkInTasks[idx].nameEn = nameEn;
+      appData.learning.checkInTasks[idx].icon = icon;
+    }
+  } else {
+    // Add new
+    appData.learning.checkInTasks.push({
+      id: generateId(),
+      name,
+      nameEn,
+      icon
+    });
+  }
+
+  editingTaskId = null;
+  closeModal();
+  saveData();
+  renderLearning();
+  renderDashboard();
+}
+
+function deleteTask(taskId) {
+  if (!confirm(t('checkin_confirm_delete'))) return;
+  appData.learning.checkInTasks = appData.learning.checkInTasks.filter(t => t.id !== taskId);
+  closeModal();
+  saveData();
+  renderLearning();
+  renderDashboard();
+  showToast('已删除');
 }
 
 // ============ Budget Helpers ============
@@ -4742,7 +5015,7 @@ function generateWeeklyReport() {
   const weekEndStr = `${weekEnd.getMonth()+1}/${weekEnd.getDate()}`;
 
   let learnTotal = 0, consumeTotal = 0, exerciseTotal = 0, workTotal = 0, workDone = 0;
-  const tasks = appData.checkInTasks;
+  const tasks = appData.learning.checkInTasks || [];
   let checkInCount = 0;
   for (let i = 0; i < 7; i++) {
     const d = new Date(weekStart); d.setDate(weekStart.getDate() + i);
@@ -4778,7 +5051,7 @@ function generateMonthlyReport() {
   let learnTotal = 0, consumeTotal = 0, exerciseTotal = 0;
   // Check-in count
   let checkInCount = 0;
-  const tasks = appData.checkInTasks;
+  const tasks = appData.learning.checkInTasks || [];
   if (appData.learning.checkIns) {
     for (const [ds, ci] of Object.entries(appData.learning.checkIns)) {
       if (ds.startsWith(monthPrefix)) {
@@ -4832,6 +5105,17 @@ async function loadAppData() {
       // Fresh data, no demo needed (user will add their own)
       appData = getDefaultData();
     }
+  }
+
+  // Migrate old data: move checkInTasks from root into learning
+  if (appData.checkInTasks && !appData.learning.checkInTasks) {
+    appData.learning.checkInTasks = appData.checkInTasks;
+    delete appData.checkInTasks;
+  }
+  // Ensure checkInTasks array exists
+  if (!appData.learning.checkInTasks || !Array.isArray(appData.learning.checkInTasks) || appData.learning.checkInTasks.length === 0) {
+    const defaults = getDefaultData();
+    appData.learning.checkInTasks = defaults.learning.checkInTasks;
   }
 
   renderDashboard();
