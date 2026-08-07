@@ -340,6 +340,142 @@ body {
   flex-shrink: 0;
   margin-left: 8px;
 }
+
+/* ========== Learning Calendar ========== */
+.learn-calendar-container {
+  background: var(--bg-secondary);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow);
+}
+.learn-calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.learn-calendar-month-label {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.learn-calendar-nav-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.learn-calendar-nav-btn:hover {
+  background: var(--accent);
+  color: #fff;
+}
+.learn-calendar-nav-btn:active {
+  transform: scale(0.9);
+}
+.learn-calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  margin-bottom: 6px;
+}
+.learn-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+.learn-calendar-cell {
+  aspect-ratio: 1;
+  border-radius: var(--radius-xs);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  border: 2px solid transparent;
+}
+.learn-calendar-cell:hover {
+  transform: scale(1.08);
+  z-index: 2;
+}
+.learn-calendar-cell.today {
+  border-color: var(--accent);
+  background: var(--accent-light);
+}
+.learn-calendar-cell.selected {
+  border-color: var(--purple);
+  background: var(--purple-light);
+}
+.learn-calendar-cell.today.selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--purple);
+}
+.learn-calendar-cell.other-month {
+  color: var(--text-tertiary);
+  opacity: 0.4;
+  cursor: default;
+}
+.learn-calendar-cell.other-month:hover {
+  transform: none;
+}
+.learn-calendar-cell.future {
+  opacity: 0.5;
+  cursor: default;
+}
+.learn-calendar-cell.future:hover {
+  transform: none;
+}
+.learn-calendar-dots {
+  display: flex;
+  gap: 2px;
+  margin-top: 2px;
+}
+.learn-calendar-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--border);
+  transition: background 0.2s;
+}
+.learn-calendar-dot.done {
+  background: var(--green);
+}
+.learn-calendar-legend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 10px;
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+.learn-calendar-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.learn-calendar-legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
 .progress-fill.green { background: var(--green); }
 .progress-fill.blue { background: var(--accent); }
 .progress-fill.orange { background: var(--orange); }
@@ -1504,7 +1640,9 @@ body {
     <div class="page" id="page-learning">
       <div class="section-title" data-i18n="learning_records">📚 学习打卡</div>
       <div id="learnDateNav"></div>
-      <div id="learnMonthSummary"></div>
+
+      <!-- Calendar -->
+      <div id="learnCalendar"></div>
 
       <div class="stat-grid">
         <div class="stat-card">
@@ -1946,6 +2084,11 @@ const I18N = {
   checkin_all_done: { zh: '🎉 今日全部完成！太棒了！', en: '🎉 All done today! Great job!' },
   checkin_none: { zh: '今天还没有打卡哦', en: 'No check-ins yet today' },
   checkin_progress: { zh: '完成进度', en: 'Progress' },
+  checkin_calendar: { zh: '打卡日历', en: 'Calendar' },
+  calendar_prev: { zh: '上个月', en: 'Prev' },
+  calendar_next: { zh: '下个月', en: 'Next' },
+  calendar_less: { zh: '少', en: 'Less' },
+  calendar_more: { zh: '多', en: 'More' },
   total_study_hours: { zh: '学习总时长', en: 'Total Hours' },
   study_hours: { zh: '学习时长（小时）', en: 'Study Duration (hours)' },
   study_streak: { zh: '连续学习', en: 'Streak' },
@@ -2774,6 +2917,7 @@ function showToast(msg) {
 
 // ============ Date Navigation ============
 let selectedDate = getTodayStr();
+let calendarMonth = null; // Tracks the currently displayed calendar month (YYYY-MM)
 
 function changeDate(delta) {
   const d = new Date(selectedDate);
@@ -3109,10 +3253,146 @@ function resetBannerBg(e) {
 }
 
 // ============ Learning ============
+// ============ Learning Calendar ============
+function changeCalendarMonth(delta) {
+  if (!calendarMonth) {
+    const d = new Date();
+    calendarMonth = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+  }
+  const [y, m] = calendarMonth.split('-').map(Number);
+  const d = new Date(y, m - 1 + delta, 1);
+  calendarMonth = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+  renderLearningCalendar();
+}
+
+function renderLearningCalendar() {
+  const today = getTodayStr();
+  if (!calendarMonth) {
+    const d = new Date();
+    calendarMonth = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+  }
+  const [year, month] = calendarMonth.split('-').map(Number);
+  const lang = appData.lang || 'zh';
+
+  // Month names
+  const monthNamesZh = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+  const monthNamesEn = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const monthLabel = lang === 'en' ? `${monthNamesEn[month-1]} ${year}` : `${year}年${monthNamesZh[month-1]}`;
+
+  // Weekday headers
+  const weekdaysZh = ['一','二','三','四','五','六','日'];
+  const weekdaysEn = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const weekdays = lang === 'en' ? weekdaysEn : weekdaysZh;
+
+  // Get first and last day of month
+  const firstDay = new Date(year, month - 1, 1);
+  const lastDay = new Date(year, month, 0);
+  const daysInMonth = lastDay.getDate();
+  // Day of week: 0=Sun, 1=Mon... Get the starting position (Mon=0)
+  let startDow = firstDay.getDay(); // 0=Sun
+  startDow = startDow === 0 ? 6 : startDow - 1; // Convert to Mon=0
+
+  const tasks = appData.checkInTasks;
+
+  // Build calendar cells
+  let cellsHtml = '';
+  const todayStr = today;
+
+  // Empty cells before first day
+  for (let i = 0; i < startDow; i++) {
+    cellsHtml += '<div class="learn-calendar-cell other-month"></div>';
+  }
+
+  // Day cells
+  for (let day = 1; day <= daysInMonth; day++) {
+    const ds = `${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    const ci = (appData.learning.checkIns && appData.learning.checkIns[ds]) || {};
+    const doneCount = tasks.filter(t => ci[t.id]).length;
+    const totalCount = tasks.length;
+
+    // Check if today
+    const isToday = ds === todayStr;
+    // Check if selected
+    const isSelected = ds === selectedDate;
+    // Check if future
+    const isFuture = ds > todayStr;
+
+    // Determine background color based on completion
+    let bgStyle = '';
+    if (doneCount > 0 && !isToday && !isSelected) {
+      const alpha = Math.min(0.15 + (doneCount / totalCount) * 0.5, 0.6);
+      bgStyle = `background: rgba(52,199,89,${alpha});`;
+    }
+
+    // Build class list
+    let cls = 'learn-calendar-cell';
+    if (isToday) cls += ' today';
+    if (isSelected) cls += ' selected';
+    if (isFuture) cls += ' future';
+
+    // Dots for task completion
+    let dotsHtml = '';
+    for (let t = 0; t < totalCount; t++) {
+      const taskDone = ci[tasks[t].id];
+      dotsHtml += `<div class="learn-calendar-dot${taskDone ? ' done' : ''}"></div>`;
+    }
+
+    cellsHtml += `
+      <div class="${cls}" style="${bgStyle}" onclick="${!isFuture ? `selectCalendarDate('${ds}')` : ''}">
+        <span>${day}</span>
+        <div class="learn-calendar-dots">${dotsHtml}</div>
+      </div>`;
+  }
+
+  // Legend
+  const legendHtml = `
+    <div class="learn-calendar-legend">
+      <span class="learn-calendar-legend-item">
+        <span class="learn-calendar-legend-dot" style="background:var(--border)"></span> ${t('calendar_less')}
+      </span>
+      <span class="learn-calendar-legend-item">
+        <span class="learn-calendar-legend-dot" style="background:rgba(52,199,89,0.2)"></span>
+      </span>
+      <span class="learn-calendar-legend-item">
+        <span class="learn-calendar-legend-dot" style="background:rgba(52,199,89,0.4)"></span>
+      </span>
+      <span class="learn-calendar-legend-item">
+        <span class="learn-calendar-legend-dot" style="background:rgba(52,199,89,0.6)"></span>
+      </span>
+      <span> ${t('calendar_more')}</span>
+    </div>`;
+
+  document.getElementById('learnCalendar').innerHTML = `
+    <div class="learn-calendar-container">
+      <div class="learn-calendar-header">
+        <button class="learn-calendar-nav-btn" onclick="changeCalendarMonth(-1)">‹</button>
+        <span class="learn-calendar-month-label">${monthLabel}</span>
+        <button class="learn-calendar-nav-btn" onclick="changeCalendarMonth(1)">›</button>
+      </div>
+      <div class="learn-calendar-weekdays">
+        ${weekdays.map(w => `<span>${w}</span>`).join('')}
+      </div>
+      <div class="learn-calendar-grid">
+        ${cellsHtml}
+      </div>
+      ${legendHtml}
+    </div>`;
+}
+
+function selectCalendarDate(ds) {
+  selectedDate = ds;
+  // Update calendar month if we jumped to a different month
+  const [y, m] = ds.split('-');
+  calendarMonth = `${y}-${String(parseInt(m)).padStart(2,'0')}`;
+  renderLearningCalendar();
+  renderLearning();
+  document.getElementById('mainContent').scrollTop = 0;
+}
+
 function renderLearning() {
   const today = selectedDate;
   document.getElementById('learnDateNav').innerHTML = getDateNavHtml();
-  document.getElementById('learnMonthSummary').innerHTML = getMonthSummaryHtml('learning');
+  renderLearningCalendar();
 
   // Get check-ins for selected date
   const todayCheckIns = (appData.learning.checkIns && appData.learning.checkIns[today]) || {};
