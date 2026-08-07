@@ -3873,7 +3873,8 @@ function deleteWeekendPlan(id) {
 }
 
 // ============ Edit Functions ============
-// ============ Delete functions ============function editConsume(id) {
+// ============ Delete functions ============
+function editConsume(id) {
   const r = appData.consume.records.find(x => x.id === id);
   if (!r) return;
   const cats = [['food','🍜 餐饮'],['transport','🚌 交通'],['shopping','🛍️ 购物'],['entertainment','🎬 娱乐'],['study','📚 学习投资'],['other','📝 其他']];
