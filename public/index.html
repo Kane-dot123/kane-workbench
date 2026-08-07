@@ -308,6 +308,38 @@ body {
   border-radius: 3px;
   transition: width 0.5s ease;
 }
+
+/* ========== Check-in Cards ========== */
+.checkin-card {
+  margin-bottom: 10px;
+  border: 2px solid var(--border);
+}
+.checkin-card:hover {
+  border-color: var(--accent);
+  transform: scale(1.02);
+}
+.checkin-card.checkin-done {
+  border-color: #34C759;
+  background: rgba(52,199,89,0.06);
+}
+.checkin-check {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.checkin-check.checked {
+  background: #34C759;
+}
+.checkin-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+  margin-left: 8px;
+}
 .progress-fill.green { background: var(--green); }
 .progress-fill.blue { background: var(--accent); }
 .progress-fill.orange { background: var(--orange); }
@@ -1462,7 +1494,7 @@ body {
           <div class="ai-avatar">🤖</div>
           <span class="ai-name">Kane AI</span>
         </div>
-        <div class="ai-text" id="aiSummaryText">今天刚开始，让我们开启高效的一天吧！记得记录你的学习、消费和运动数据。</div>
+        <div class="ai-text" id="aiSummaryText" data-i18n="ai_default">今天刚开始，让我们开启高效的一天吧！记得打卡学习、记录消费和运动数据。</div>
       </div>
 
       <div style="height:20px"></div>
@@ -1470,49 +1502,30 @@ body {
 
     <!-- ==================== Learning Page ==================== -->
     <div class="page" id="page-learning">
-      <div class="section-title" data-i18n="learning_records">📚 学习记录</div>
+      <div class="section-title" data-i18n="learning_records">📚 学习打卡</div>
       <div id="learnDateNav"></div>
       <div id="learnMonthSummary"></div>
 
       <div class="stat-grid">
         <div class="stat-card">
-          <div class="stat-value" id="learnTotalHours">0h</div>
-          <div class="stat-label">学习总时长</div>
+          <div class="stat-value" id="learnDoneToday">0/4</div>
+          <div class="stat-label" data-i18n="checkin_done_today">项已完成</div>
         </div>
         <div class="stat-card">
           <div class="stat-value" id="learnStreak">0天</div>
-          <div class="stat-label">连续学习</div>
+          <div class="stat-label" data-i18n="checkin_streak">连续打卡</div>
         </div>
       </div>
 
-      <div class="section-subtitle">学习目标</div>
-      <div class="card">
-        <div class="card-row">
-          <span style="font-size:14px;color:var(--text-primary)" data-i18n="goal_label">目标：2小时</span>
-          <span style="font-size:14px;color:var(--accent)" id="learnProgress">0%</span>
-        </div>
-        <div class="progress-bar"><div class="progress-fill blue" style="width:0%" id="learnProgressBar"></div></div>
+      <div class="section-subtitle" data-i18n="checkin_progress">完成进度</div>
+      <div class="card" style="margin-bottom:12px">
+        <div class="progress-bar" style="height:12px;border-radius:6px"><div class="progress-fill blue" style="width:0%;transition:width 0.3s;border-radius:6px" id="checkinProgressBar"></div></div>
+        <div style="margin-top:8px;font-size:13px;color:var(--accent);text-align:center" id="checkinStatus"></div>
       </div>
 
-      <div class="section-subtitle">学习模块</div>
-      <div class="card" id="learnModules">
-        <div class="empty-state"><div class="empty-icon">📖</div><div class="empty-text">还没有学习记录</div><div class="empty-hint">点击右下角 + 添加</div></div>
-      </div>
+      <div class="section-subtitle">📋 打卡项目</div>
+      <div id="checkInCards"></div>
 
-      <div class="section-subtitle">➕ 添加学习记录</div>
-      <div class="card inline-form">
-        <select id="il_mod">
-          <option value="">选择模块</option>
-          <option value="eng">🔤 英语学习</option>
-          <option value="course">🎓 课程学习</option>
-        </select>
-        <input id="il_title" type="text" placeholder="学了什么（如：单词学习1小时，学会了30个）">
-        <input id="il_hours" type="number" step="0.5" placeholder="学习时长(h)">
-        <input id="il_note" type="text" placeholder="备注（可选）">
-        <button class="btn-add" onclick="submitInlineLearning()">添加记录</button>
-      </div>
-
-      <div class="section-subtitle">学习记录</div>
       <div id="learnRecords"></div>
 
       <div style="height:20px"></div>
@@ -1906,7 +1919,7 @@ const I18N = {
   tab_work: { zh: '工作', en: 'Work' },
 
   // Dashboard
-  today_learning: { zh: '📚 今日学习', en: '📚 Study' },
+  today_learning: { zh: '📚 今日打卡', en: '📚 Check-in' },
   today_consume: { zh: '💰 今日消费', en: '💰 Spend' },
   today_exercise: { zh: '🏃 今日运动', en: '🏃 Move' },
   today_work: { zh: '今日工作', en: 'Work' },
@@ -1923,10 +1936,16 @@ const I18N = {
   of: { zh: '项', en: 'items' },
   kane_level: { zh: 'KANE LEVEL', en: 'KANE LEVEL' },
   ai_name: { zh: 'Kane AI', en: 'Kane AI' },
-  ai_default: { zh: '今天刚开始，让我们开启高效的一天吧！记得记录你的学习、消费和运动数据。', en: 'A fresh start today! Let\'s make it productive. Remember to log your study, spending, and exercise.' },
+  ai_default: { zh: '今天刚开始，让我们开启高效的一天吧！记得打卡学习、记录消费和运动数据。', en: 'A fresh start today! Let\'s make it productive. Remember to check in, log your spending, and exercise.' },
 
   // Learning Page
-  learning_records: { zh: '📚 学习记录', en: '📚 Study' },
+  learning_records: { zh: '📚 学习打卡', en: '📚 Check-in' },
+  checkin_title: { zh: '📚 每日打卡', en: '📚 Daily Check-in' },
+  checkin_done_today: { zh: '项已完成', en: 'done' },
+  checkin_streak: { zh: '连续打卡', en: 'Streak' },
+  checkin_all_done: { zh: '🎉 今日全部完成！太棒了！', en: '🎉 All done today! Great job!' },
+  checkin_none: { zh: '今天还没有打卡哦', en: 'No check-ins yet today' },
+  checkin_progress: { zh: '完成进度', en: 'Progress' },
   total_study_hours: { zh: '学习总时长', en: 'Total Hours' },
   study_hours: { zh: '学习时长（小时）', en: 'Study Duration (hours)' },
   study_streak: { zh: '连续学习', en: 'Streak' },
@@ -2577,11 +2596,18 @@ function getDefaultData() {
     level: 1,
     learning: {
       records: [],
+      checkIns: {},
       modules: [
         { id: 'eng', name: '英语学习', hours: 0, target: 1 },
         { id: 'course', name: '课程学习', hours: 0, target: 0.5 }
       ]
     },
+    checkInTasks: [
+      { id: 'vocab', name: '背单词', nameEn: 'Vocab', icon: '📝' },
+      { id: 'eng_class', name: '上英语课', nameEn: 'English Class', icon: '🏫' },
+      { id: 'pronunciation', name: '练习发音', nameEn: 'Pronunciation', icon: '🗣️' },
+      { id: 'writing', name: '写句子', nameEn: 'Writing', icon: '✍️' }
+    ],
     consume: {
       records: [],
       monthlyLimit: 2500
@@ -2816,12 +2842,31 @@ function get30DaySummary() {
   const startStr = toDateStr(startDate);
 
   const learnRecords = appData.learning.records.filter(r => r.date >= startStr && r.date <= getTodayStr());
+
+  // Check-in stats
+  const tasks = appData.checkInTasks;
+  let checkInDays = 0, checkInTotal = 0;
+  if (appData.learning.checkIns) {
+    const startD = new Date(startDate);
+    for (let i = 0; i < 30; i++) {
+      const ds = toDateStr(startD);
+      const ci = appData.learning.checkIns[ds] || {};
+      const done = tasks.filter(t => ci[t.id]).length;
+      if (done > 0) checkInDays++;
+      checkInTotal += done;
+      startD.setDate(startD.getDate() + 1);
+    }
+  }
   const consumeRecords = appData.consume.records.filter(r => r.date >= startStr && r.date <= getTodayStr());
   const exerciseRecords = appData.exercise.records.filter(r => r.date >= startStr && r.date <= getTodayStr());
   const workTasks = appData.work.tasks.filter(t => (t.date || getTodayStr()) >= startStr && (t.date || getTodayStr()) <= getTodayStr());
 
   return {
     learnHours: learnRecords.reduce((s,r) => s + (r.hours || 0), 0),
+    learnDays: new Set(learnRecords.map(r => r.date)).size,
+    checkInDays: checkInDays,
+    checkInTotal: checkInTotal,
+    checkInAvg: checkInDays > 0 ? (checkInTotal / checkInDays).toFixed(1) : '0',
     consumeTotal: consumeRecords.reduce((s,r) => s + (r.amount || 0), 0),
     exerciseMin: exerciseRecords.reduce((s,r) => s + (r.minutes || 0), 0),
     exerciseCal: exerciseRecords.reduce((s,r) => s + (r.calories || 0), 0),
@@ -2840,9 +2885,9 @@ function getMonthSummaryHtml(type) {
     return `<div class="month-summary">
       <div class="ms-title">${title}</div>
       <div class="ms-grid">
-        <div class="ms-item"><div class="ms-val">${s.learnHours.toFixed(1)}h</div><div class="ms-label">${t('total_study')}</div></div>
-        <div class="ms-item"><div class="ms-val">${s.learnDays}</div><div class="ms-label">${t('study_days')}</div></div>
-        <div class="ms-item"><div class="ms-val">${(s.learnHours / Math.max(s.learnDays,1)).toFixed(1)}h</div><div class="ms-label">${t('daily_avg')}</div></div>
+        <div class="ms-item"><div class="ms-val">${s.checkInTotal}</div><div class="ms-label">${t('checkin_done_today')}</div></div>
+        <div class="ms-item"><div class="ms-val">${s.checkInDays}</div><div class="ms-label">${t('checkin_streak')}天数</div></div>
+        <div class="ms-item"><div class="ms-val">${s.checkInAvg}</div><div class="ms-label">${t('daily_avg')}</div></div>
       </div>
     </div>`;
   }
@@ -2970,6 +3015,12 @@ function renderDashboard() {
   // Calculate stats
   const todayLearning = appData.learning.records.filter(r => r.date === today);
   const totalLearnHours = todayLearning.reduce((s,r) => s + (r.hours || 0), 0);
+
+  // Check-in stats for today
+  const todayCheckIns = (appData.learning.checkIns && appData.learning.checkIns[today]) || {};
+  const tasks = appData.checkInTasks;
+  const checkInDone = tasks.filter(t => todayCheckIns[t.id]).length;
+  const checkInTotal = tasks.length;
   const todayConsume = appData.consume.records.filter(r => r.date === today);
   const totalConsume = todayConsume.reduce((s,r) => s + (r.amount || 0), 0);
   const todayExercise = appData.exercise.records.filter(r => r.date === today);
@@ -2980,14 +3031,14 @@ function renderDashboard() {
   const workDone = allPendingWork.filter(t => t.done).length;
 
   // Stats display
-  document.getElementById('statLearning').textContent = totalLearnHours.toFixed(1) + 'h';
+  document.getElementById('statLearning').textContent = checkInDone + '/' + checkInTotal;
   document.getElementById('statConsume').textContent = '¥' + totalConsume;
   document.getElementById('statExercise').textContent = totalExerciseMin + 'min';
   document.getElementById('statWork').textContent = workDone + '/' + allPendingWork.length;
 
-  document.getElementById('dashLearning').textContent = totalLearnHours > 0 ?
-    `${totalLearnHours.toFixed(1)}${t('hours')} · ${todayLearning.length}${t('records')}` : t('no_records');
-  document.getElementById('dashLearningBar').style.width = Math.min(100, (totalLearnHours / 2) * 100) + '%';
+  document.getElementById('dashLearning').textContent = checkInDone > 0 ?
+    `✅ ${checkInDone}/${checkInTotal} ${t('checkin_done_today')}` : t('checkin_none');
+  document.getElementById('dashLearningBar').style.width = Math.round((checkInDone / checkInTotal) * 100) + '%';
 
   document.getElementById('dashConsume').textContent = totalConsume > 0 ?
     `¥${totalConsume} · ${todayConsume.length}${t('expense')}` : t('no_records');
@@ -3062,60 +3113,83 @@ function renderLearning() {
   const today = selectedDate;
   document.getElementById('learnDateNav').innerHTML = getDateNavHtml();
   document.getElementById('learnMonthSummary').innerHTML = getMonthSummaryHtml('learning');
-  const records = appData.learning.records.filter(r => r.date === today);
-  const totalHours = records.reduce((s,r) => s + (r.hours || 0), 0);
 
-  document.getElementById('learnTotalHours').textContent = totalHours.toFixed(1) + 'h';
+  // Get check-ins for selected date
+  const todayCheckIns = (appData.learning.checkIns && appData.learning.checkIns[today]) || {};
+  const tasks = appData.checkInTasks;
+  const doneCount = tasks.filter(t => todayCheckIns[t.id]).length;
+  const totalCount = tasks.length;
+  const pct = Math.round((doneCount / totalCount) * 100);
 
-  // Calculate streak
+  // Stats
+  document.getElementById('learnDoneToday').textContent = doneCount + '/' + totalCount;
+
+  // Streak
   let streak = 0;
   const d = new Date();
   for (let i = 0; i < 365; i++) {
     const ds = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-    const hasRecords = appData.learning.records.some(r => r.date === ds);
-    if (hasRecords) streak++; else break;
+    const ci = (appData.learning.checkIns && appData.learning.checkIns[ds]) || {};
+    const hasCheckIn = tasks.some(t => ci[t.id]);
+    if (hasCheckIn) streak++; else break;
     d.setDate(d.getDate() - 1);
   }
   document.getElementById('learnStreak').textContent = streak + t('days');
 
-  // Progress
-  const progress = Math.min(100, Math.round((totalHours / 2) * 100));
-  document.getElementById('learnProgress').textContent = progress + '%';
-  document.getElementById('learnProgressBar').style.width = progress + '%';
+  // Progress bar
+  const bar = document.getElementById('checkinProgressBar');
+  bar.style.width = pct + '%';
+  if (pct === 100) bar.style.background = '#34C759';
+  else if (pct >= 75) bar.style.background = '#FFCC00';
+  else if (pct >= 50) bar.style.background = '#FF9500';
+  else bar.style.background = 'var(--accent)';
 
-  // Modules
-  const modulesHtml = appData.learning.modules.map(m => {
-    const modRecords = records.filter(r => r.module === m.id);
-    const modHours = modRecords.reduce((s,r) => s + (r.hours || 0), 0);
-    const modProgress = Math.min(100, Math.round((modHours / m.target) * 100));
+  // Status text
+  const statusEl = document.getElementById('checkinStatus');
+  if (pct === 100) {
+    statusEl.textContent = t('checkin_all_done');
+  } else if (doneCount === 0) {
+    statusEl.textContent = t('checkin_none');
+  } else {
+    statusEl.textContent = doneCount + '/' + totalCount + ' ' + t('checkin_done_today');
+  }
+
+  // Check-in cards
+  const isToday = today === getTodayStr();
+  const cardsHtml = tasks.map(tk => {
+    const checked = !!todayCheckIns[tk.id];
+    const name = appData.lang === 'en' ? tk.nameEn : tk.name;
     return `
-      <div class="list-item" style="cursor:pointer;position:relative" onclick="openLearningModuleForm('${m.id}', '${m.name}', '${m.id==='eng'?'🔤':'🎓'}')">
-        <div class="card-icon icon-bg-blue" style="font-size:18px">${m.id==='eng'?'🔤':'🎓'}</div>
-        <div class="card-info" style="margin-left:10px">
-          <h4>${m.name}</h4>
-          <p>${modHours.toFixed(1)} / ${m.target}h</p>
-          <div class="progress-bar" style="margin-top:6px"><div class="progress-fill blue" style="width:${modProgress}%"></div></div>
+      <div class="card checkin-card ${checked ? 'checkin-done' : ''}" onclick="toggleCheckIn('${tk.id}')" style="cursor:pointer;transition:all 0.2s">
+        <div class="card-row">
+          <div class="checkin-check ${checked ? 'checked' : ''}">${checked ? '✅' : '⭕'}</div>
+          <div class="checkin-icon">${tk.icon}</div>
+          <div class="card-info" style="flex:1;margin-left:12px">
+            <h4 style="margin:0;font-size:16px">${name}</h4>
+          </div>
+          ${checked ? '<div style="color:#34C759;font-size:13px">✓</div>' : ''}
         </div>
-        <div style="position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--text-tertiary);font-size:18px">›</div>
       </div>`;
   }).join('');
-  document.getElementById('learnModules').innerHTML = modulesHtml || '<div class="empty-state"><div class="empty-icon">📖</div><div class="empty-text">' + t('loading_modules') + '</div></div>';
+  document.getElementById('checkInCards').innerHTML = cardsHtml;
 
-  // Records
-  const recordsHtml = records.length > 0 ? records.map(r => `
-    <div class="list-item">
-      <div class="card-icon icon-bg-blue" style="font-size:16px">${r.module==='eng'?'🔤':'🎓'}</div>
-      <div class="list-content">
-        <div class="list-title">${r.title || t('study_record')}</div>
-        <div class="list-meta">${r.hours}h · ${r.note || t('no_note')}</div>
-      </div>
-      <div class="record-actions">
-        <button class="edit-btn" onclick="editLearning('${r.id}')">✎</button>
-        <div class="list-delete" style="opacity:1" onclick="deleteLearning('${r.id}')">✕</div>
-      </div>
-    </div>
-  `).join('') : '<div class="empty-state"><div class="empty-icon">📝</div><div class="empty-text">' + t('no_study_records') + '</div></div>';
-  document.getElementById('learnRecords').innerHTML = recordsHtml;
+  // Legacy records section (hidden by default, kept for backward compat)
+  const records = appData.learning.records.filter(r => r.date === today);
+  document.getElementById('learnRecords').innerHTML = records.length > 0 ? '' : '';
+}
+
+function toggleCheckIn(taskId) {
+  const date = selectedDate;
+  if (!appData.learning.checkIns) appData.learning.checkIns = {};
+  if (!appData.learning.checkIns[date]) appData.learning.checkIns[date] = {};
+
+  const current = appData.learning.checkIns[date][taskId];
+  appData.learning.checkIns[date][taskId] = !current;
+
+  if (!current) addXP(8); // XP on checking in (not unchecking)
+  saveData();
+  renderLearning();
+  renderDashboard();
 }
 
 // ============ Budget Helpers ============
@@ -3508,7 +3582,6 @@ function submitExerciseForm() {
 }
 
 const QUICK_ADD_PAGES = [
-  { id: 'learning', icon: '📚', title: '添加学习记录', color: 'var(--accent)', fields: ['title::text:内容', 'module::select:模块:eng:英语学习,course:课程学习', 'hours::number:学习时长(h)', 'note::text:备注'] },
   { id: 'consume', icon: '💰', title: '添加消费记录', color: 'var(--orange)', fields: ['title::text:项目', 'amount::number:金额(¥)', 'category::select:分类:food:餐饮,transport:交通,shopping:购物,entertainment:娱乐,study:学习投资,other:其他', 'note::text:备注'] },
   { id: 'exercise', icon: '🏃', title: '添加运动记录', color: 'var(--green)', fields: ['type::select:类型:running:跑步,strength:力量训练,basketball:篮球,walk:散步,stretch:拉伸,swimming:游泳', 'minutes::number:时长(分钟)', 'calories::number:消耗卡路里', 'steps::number:步数'] },
   { id: 'work', icon: '💼', title: '添加工作任务', color: 'var(--purple)', fields: ['title::text:任务名称', 'priority::select:优先级:high:🔴 高,medium:🟡 中,low:🟢 低', 'note::text:备注'] },
@@ -3661,21 +3734,6 @@ function submitQuickAdd(page) {
 }
 
 // ============ Inline Form Functions ============
-function submitInlineLearning() {
-  const mod = document.getElementById('il_mod').value;
-  const title = document.getElementById('il_title').value.trim();
-  const hours = parseFloat(document.getElementById('il_hours').value) || 0;
-  const note = document.getElementById('il_note').value.trim();
-  if (!mod) { showToast('请选择模块'); return; }
-  if (!title) { showToast('请填写学了什么'); return; }
-  appData.learning.records.push({ id: generateId(), date: selectedDate, title, module: mod, hours, note });
-  saveData(); addXP(10);
-  renderLearning(); renderDashboard();
-  document.getElementById('il_title').value = '';
-  document.getElementById('il_hours').value = '';
-  document.getElementById('il_note').value = '';
-  showToast('学习记录已添加 ✅');
-}
 
 function submitInlineConsume() {
   const cat = document.getElementById('ic_cat').value;
@@ -3722,11 +3780,7 @@ function dashFormChange() {
     c.innerHTML = '<input type="text" disabled placeholder="请先选择记录类型" style="opacity:0.5">';
     return;
   }
-  if (type === 'learning') {
-    c.innerHTML = '<select id="id_mod"><option value="">选择模块</option><option value="eng">🔤 英语学习</option><option value="course">🎓 课程学习</option></select>' +
-      '<input id="id_title" type="text" placeholder="学了什么">' +
-      '<input id="id_hours" type="number" step="0.5" placeholder="学习时长(h)">';
-  } else if (type === 'consume') {
+  if (type === 'consume') {
     c.innerHTML = '<select id="id_cat"><option value="">选择分类</option><option value="food">🍜 餐饮</option><option value="transport">🚌 交通</option><option value="shopping">🛍️ 购物</option><option value="entertainment">🎬 娱乐</option><option value="study">📚 学习投资</option><option value="other">📝 其他</option></select>' +
       '<input id="id_title" type="text" placeholder="消费项目">' +
       '<input id="id_amount" type="number" step="0.01" placeholder="金额(¥)">';
@@ -3741,14 +3795,7 @@ function submitInlineDash() {
   if (!type) { showToast('请选择记录类型'); return; }
   const today = getTodayStr();
 
-  if (type === 'learning') {
-    const mod = document.getElementById('id_mod') && document.getElementById('id_mod').value;
-    const title = document.getElementById('id_title') && document.getElementById('id_title').value.trim();
-    const hours = parseFloat(document.getElementById('id_hours') && document.getElementById('id_hours').value) || 0;
-    if (!mod || !title) { showToast('请填写完整'); return; }
-    appData.learning.records.push({ id: generateId(), date: today, title, module: mod, hours, note: '' });
-    addXP(10);
-  } else if (type === 'consume') {
+  if (type === 'consume') {
     const cat = document.getElementById('id_cat') && document.getElementById('id_cat').value;
     const title = document.getElementById('id_title') && document.getElementById('id_title').value.trim();
     const amount = parseFloat(document.getElementById('id_amount') && document.getElementById('id_amount').value) || 0;
@@ -3789,61 +3836,6 @@ function addXP(amount) {
 }
 
 // ============ Learning Module Quick-Edit Form ============
-function openLearningModuleForm(moduleId, moduleName, icon) {
-  const placeholderNote = moduleId === 'eng'
-    ? t('ph_eng')
-    : t('ph_course');
-  const today = getTodayStr();
-
-  const modalContent = `
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
-      <div style="font-size:28px">${icon}</div>
-      <div>
-        <h3 style="margin:0">${moduleName}</h3>
-        <p style="margin:2px 0 0;font-size:13px;color:var(--text-tertiary)">${t('record_today')}</p>
-      </div>
-    </div>
-    <label style="display:block;font-size:13px;color:var(--text-secondary);margin-bottom:6px">${t('content_optional')}</label>
-    <input type="text" id="learnModuleTitle" placeholder="${t('content_ph')}" style="width:100%;padding:12px;border-radius:8px;border:1px solid var(--border);background:var(--bg-tertiary);color:var(--text-primary);font-size:15px;margin-bottom:14px;font-family:var(--font-system);outline:none">
-    <label style="display:block;font-size:13px;color:var(--text-secondary);margin-bottom:6px">${t('study_hours')} <span style="color:var(--red)">*</span></label>
-    <input type="number" id="learnModuleHours" step="0.1" min="0" placeholder="${t('hours_ph')}" style="width:100%;padding:12px;border-radius:8px;border:1px solid var(--border);background:var(--bg-tertiary);color:var(--text-primary);font-size:15px;margin-bottom:14px;font-family:var(--font-system);outline:none">
-    <label style="display:block;font-size:13px;color:var(--text-secondary);margin-bottom:6px">${t('what_learned')}</label>
-    <textarea id="learnModuleNote" rows="3" placeholder="${placeholderNote}" style="width:100%;padding:12px;border-radius:8px;border:1px solid var(--border);background:var(--bg-tertiary);color:var(--text-primary);font-size:15px;margin-bottom:14px;font-family:var(--font-system);outline:none;resize:vertical"></textarea>
-    <div class="btn-row">
-      <button class="btn secondary" onclick="closeModal()">${t('cancel_btn')}</button>
-      <button class="btn primary" onclick="submitLearningModuleForm('${moduleId}')">${t('save_btn')}</button>
-    </div>
-  `;
-
-  document.getElementById('modalContent').innerHTML = modalContent;
-  document.getElementById('modalOverlay').classList.add('show');
-  setTimeout(() => { try { document.getElementById('learnModuleHours').focus(); } catch(e){} }, 100);
-}
-
-function submitLearningModuleForm(moduleId) {
-  const title = (document.getElementById('learnModuleTitle').value || '').trim();
-  const hours = parseFloat(document.getElementById('learnModuleHours').value) || 0;
-  const note = (document.getElementById('learnModuleNote').value || '').trim();
-  if (!hours || hours <= 0) { showToast('请填写学习时长'); return; }
-  const today = selectedDate;
-  // Default title based on module if blank
-  const finalTitle = title || (moduleId === 'eng' ? '英语学习' : '课程学习');
-  appData.learning.records.push({
-    id: generateId(),
-    date: today,
-    title: finalTitle,
-    module: moduleId,
-    hours: hours,
-    note: note
-  });
-  addXP(10);
-  saveData();
-  closeModal();
-  showToast('已记录 ✅');
-  renderLearning();
-  renderDashboard();
-}
-
 // ============ Modal ============
 function closeModal(e) {
   if (e && e.target !== document.getElementById('modalOverlay')) return;
@@ -3881,47 +3873,7 @@ function deleteWeekendPlan(id) {
 }
 
 // ============ Edit Functions ============
-function editLearning(id) {
-  const r = appData.learning.records.find(x => x.id === id);
-  if (!r) return;
-  const modalContent = `
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
-      <div style="font-size:28px">✎</div>
-      <h3 style="margin:0">编辑学习记录</h3>
-    </div>
-    <label style="display:block;font-size:13px;color:var(--text-secondary);margin-bottom:6px">模块</label>
-    <select id="el_mod" style="width:100%;padding:12px;border-radius:8px;border:1px solid var(--border);background:var(--bg-tertiary);color:var(--text-primary);font-size:15px;margin-bottom:12px;font-family:var(--font-system);outline:none">
-      <option value="eng" ${r.module==='eng'?'selected':''}>🔤 英语学习</option>
-      <option value="course" ${r.module==='course'?'selected':''}>🎓 课程学习</option>
-    </select>
-    <label style="display:block;font-size:13px;color:var(--text-secondary);margin-bottom:6px">内容</label>
-    <input type="text" id="el_title" value="${r.title||''}" placeholder="学了什么" style="width:100%;padding:12px;border-radius:8px;border:1px solid var(--border);background:var(--bg-tertiary);color:var(--text-primary);font-size:15px;margin-bottom:12px;font-family:var(--font-system);outline:none">
-    <label style="display:block;font-size:13px;color:var(--text-secondary);margin-bottom:6px">学习时长(h)</label>
-    <input type="number" id="el_hours" step="0.5" value="${r.hours||''}" placeholder="学习时长" style="width:100%;padding:12px;border-radius:8px;border:1px solid var(--border);background:var(--bg-tertiary);color:var(--text-primary);font-size:15px;margin-bottom:12px;font-family:var(--font-system);outline:none">
-    <label style="display:block;font-size:13px;color:var(--text-secondary);margin-bottom:6px">备注</label>
-    <input type="text" id="el_note" value="${r.note||''}" placeholder="备注" style="width:100%;padding:12px;border-radius:8px;border:1px solid var(--border);background:var(--bg-tertiary);color:var(--text-primary);font-size:15px;margin-bottom:14px;font-family:var(--font-system);outline:none">
-    <div class="btn-row">
-      <button class="btn secondary" onclick="closeModal()">取消</button>
-      <button class="btn primary" onclick="saveEditLearning('${id}')">保存</button>
-    </div>
-  `;
-  document.getElementById('modalContent').innerHTML = modalContent;
-  document.getElementById('modalOverlay').classList.add('show');
-}
-
-function saveEditLearning(id) {
-  const r = appData.learning.records.find(x => x.id === id);
-  if (!r) return;
-  r.module = document.getElementById('el_mod').value || r.module;
-  r.title = document.getElementById('el_title').value.trim() || r.title;
-  r.hours = parseFloat(document.getElementById('el_hours').value) || 0;
-  r.note = document.getElementById('el_note').value.trim();
-  saveData(); closeModal();
-  renderLearning(); renderDashboard();
-  showToast('已保存修改 ✅');
-}
-
-function editConsume(id) {
+// ============ Delete functions ============function editConsume(id) {
   const r = appData.consume.records.find(x => x.id === id);
   if (!r) return;
   const cats = [['food','🍜 餐饮'],['transport','🚌 交通'],['shopping','🛍️ 购物'],['entertainment','🎬 娱乐'],['study','📚 学习投资'],['other','📝 其他']];
@@ -4509,10 +4461,13 @@ function generateWeeklyReport() {
   const weekEndStr = `${weekEnd.getMonth()+1}/${weekEnd.getDate()}`;
 
   let learnTotal = 0, consumeTotal = 0, exerciseTotal = 0, workTotal = 0, workDone = 0;
+  const tasks = appData.checkInTasks;
+  let checkInCount = 0;
   for (let i = 0; i < 7; i++) {
     const d = new Date(weekStart); d.setDate(weekStart.getDate() + i);
     const ds = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-    learnTotal += appData.learning.records.filter(r => r.date === ds).reduce((s,r) => s + (r.hours || 0), 0);
+    const ci = (appData.learning.checkIns && appData.learning.checkIns[ds]) || {};
+    checkInCount += tasks.filter(t => ci[t.id]).length;
     consumeTotal += appData.consume.records.filter(r => r.date === ds).reduce((s,r) => s + (r.amount || 0), 0);
     exerciseTotal += appData.exercise.records.filter(r => r.date === ds).reduce((s,r) => s + (r.minutes || 0), 0);
     const weekWork = appData.work.tasks.filter(t => t.date === ds || (!t.date && i === 0));
@@ -4525,7 +4480,7 @@ function generateWeeklyReport() {
     id: generateId(),
     date: getTodayStr(),
     title: reportTitle,
-    summary: `学习${learnTotal.toFixed(1)}h · 消费¥${consumeTotal.toFixed(0)} · 运动${exerciseTotal}min · 工作${workDone}/${workTotal}`,
+    summary: `打卡${checkInCount}次 · 消费¥${consumeTotal.toFixed(0)} · 运动${exerciseTotal}min · 工作${workDone}/${workTotal}`,
     type: 'weekly'
   });
   saveData();
@@ -4540,13 +4495,17 @@ function generateMonthlyReport() {
   const monthPrefix = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}`;
 
   let learnTotal = 0, consumeTotal = 0, exerciseTotal = 0;
-  const allRecords = [
-    ...appData.learning.records.filter(r => r.date.startsWith(monthPrefix)),
-    ...appData.consume.records.filter(r => r.date.startsWith(monthPrefix)),
-    ...appData.exercise.records.filter(r => r.date.startsWith(monthPrefix))
-  ];
+  // Check-in count
+  let checkInCount = 0;
+  const tasks = appData.checkInTasks;
+  if (appData.learning.checkIns) {
+    for (const [ds, ci] of Object.entries(appData.learning.checkIns)) {
+      if (ds.startsWith(monthPrefix)) {
+        checkInCount += tasks.filter(t => ci[t.id]).length;
+      }
+    }
+  }
 
-  appData.learning.records.filter(r => r.date.startsWith(monthPrefix)).forEach(r => learnTotal += r.hours || 0);
   appData.consume.records.filter(r => r.date.startsWith(monthPrefix)).forEach(r => consumeTotal += r.amount || 0);
   appData.exercise.records.filter(r => r.date.startsWith(monthPrefix)).forEach(r => exerciseTotal += r.minutes || 0);
 
@@ -4555,7 +4514,7 @@ function generateMonthlyReport() {
     id: generateId(),
     date: getTodayStr(),
     title: reportTitle,
-    summary: `学习${learnTotal.toFixed(1)}h · 消费¥${consumeTotal.toFixed(0)} · 运动${exerciseTotal}min · 等级Lv.${appData.level}`,
+    summary: `打卡${checkInCount}次 · 消费¥${consumeTotal.toFixed(0)} · 运动${exerciseTotal}min · 等级Lv.${appData.level}`,
     type: 'monthly'
   });
   saveData();
