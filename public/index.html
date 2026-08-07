@@ -3119,31 +3119,8 @@ function renderLearning() {
 }
 
 // ============ Budget Helpers ============
-function getEffectiveBudget(monthStr) {
-  const BASE_LIMIT = appData.consume.monthlyLimit || 2500;
-  const records = appData.consume.records;
-  if (records.length === 0) return { budget: BASE_LIMIT, carryover: 0 };
-
-  // Find earliest month from records
-  const sortedDates = records.map(r => r.date).sort();
-  const earliestMonth = sortedDates[0].substring(0, 7);
-
-  let carryover = 0;
-  let cur = new Date(earliestMonth + '-01T00:00:00');
-  const target = new Date(monthStr + '-01T00:00:00');
-
-  while (cur <= target) {
-    const m = cur.getFullYear() + '-' + String(cur.getMonth() + 1).padStart(2, '0');
-    const monthSpent = records
-      .filter(r => r.date.startsWith(m))
-      .reduce((s, r) => s + (r.amount || 0), 0);
-    const budget = BASE_LIMIT + carryover;
-    carryover = Math.max(0, budget - monthSpent);
-    if (m === monthStr) break;
-    cur.setMonth(cur.getMonth() + 1);
-  }
-
-  return { budget: BASE_LIMIT + carryover, carryover: carryover };
+function getEffectiveBudget() {
+  return appData.consume.monthlyLimit || 2500;
 }
 
 // ============ Consume ============
@@ -3163,7 +3140,7 @@ function renderConsume() {
   document.getElementById('consumeMonth').textContent = '¥' + totalMonth.toFixed(0);
 
   // Budget progress
-  const { budget: effectiveBudget, carryover } = getEffectiveBudget(monthPrefix);
+  const effectiveBudget = getEffectiveBudget();
   const remaining = effectiveBudget - totalMonth;
   const pct = Math.min(100, (totalMonth / effectiveBudget * 100));
   const budgetBar = document.getElementById('budgetBar');
@@ -3172,27 +3149,17 @@ function renderConsume() {
   const budgetAlert = document.getElementById('budgetAlert');
   if (budgetBar) {
     budgetBar.style.width = pct + '%';
-    // Color: green < 70%, orange 70-90%, red > 90%
-    if (pct >= 100) {
-      budgetBar.style.background = '#FF3B30';
-    } else if (pct >= 90) {
-      budgetBar.style.background = '#FF9500';
-    } else if (pct >= 70) {
-      budgetBar.style.background = '#FFCC00';
-    } else {
-      budgetBar.style.background = '#34C759';
-    }
+    if (pct >= 100) { budgetBar.style.background = '#FF3B30'; }
+    else if (pct >= 90) { budgetBar.style.background = '#FF9500'; }
+    else if (pct >= 70) { budgetBar.style.background = '#FFCC00'; }
+    else { budgetBar.style.background = '#34C759'; }
   }
   if (budgetRemaining) {
     budgetRemaining.textContent = '¥' + Math.max(0, remaining).toFixed(0) + ' / ¥' + effectiveBudget.toFixed(0);
     budgetRemaining.style.color = remaining < 0 ? '#FF3B30' : 'var(--text-secondary)';
   }
   if (budgetDetail) {
-    if (carryover > 0) {
-      budgetDetail.textContent = t('budget_carryover') + ': +¥' + carryover.toFixed(0) + '  ·  ' + t('budget_month_total') + ': ¥' + totalMonth.toFixed(0);
-    } else {
-      budgetDetail.textContent = t('budget_month_total') + ': ¥' + totalMonth.toFixed(0) + ' / ¥' + effectiveBudget.toFixed(0);
-    }
+    budgetDetail.textContent = '¥' + totalMonth.toFixed(0) + ' / ¥' + effectiveBudget.toFixed(0);
   }
   if (budgetAlert) {
     if (totalMonth >= effectiveBudget) {
@@ -3633,7 +3600,7 @@ function submitQuickAdd(page) {
     if (!title || !category || !amount) { showToast('请填写完整信息'); return; }
     // Budget check
     const qMonthPrefix = today.substring(0, 7);
-    const { budget: qEffBudget } = getEffectiveBudget(qMonthPrefix);
+    const qEffBudget = getEffectiveBudget();
     const qMonthSpent = appData.consume.records.filter(r => r.date.startsWith(qMonthPrefix)).reduce((s,r) => s + (r.amount || 0), 0);
     if (qMonthSpent + amount > qEffBudget) {
       showToast(t('budget_add_blocked'));
@@ -3720,7 +3687,7 @@ function submitInlineConsume() {
   if (!amount) { showToast('请填写金额'); return; }
   // Budget check
   const monthPrefix = selectedDate.substring(0, 7);
-  const { budget: effBudget } = getEffectiveBudget(monthPrefix);
+  const effBudget = getEffectiveBudget();
   const monthSpent = appData.consume.records.filter(r => r.date.startsWith(monthPrefix)).reduce((s,r) => s + (r.amount || 0), 0);
   if (monthSpent + amount > effBudget) {
     showToast(t('budget_add_blocked'));
@@ -3788,7 +3755,7 @@ function submitInlineDash() {
     if (!cat || !title || !amount) { showToast('请填写完整'); return; }
     // Budget check
     const dMonthPrefix = today.substring(0, 7);
-    const { budget: dEffBudget } = getEffectiveBudget(dMonthPrefix);
+    const dEffBudget = getEffectiveBudget();
     const dMonthSpent = appData.consume.records.filter(r => r.date.startsWith(dMonthPrefix)).reduce((s,r) => s + (r.amount || 0), 0);
     if (dMonthSpent + amount > dEffBudget) {
       showToast(t('budget_add_blocked'));
